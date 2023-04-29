@@ -133,10 +133,3 @@ class TestPetFriends:
         assert self.pets_list == self.pet_uniq
 
 
-# pytest -v --driver Chrome --driver-path D:/WebDriver/chromedriver.exe tests/test_petFriends.py
-# Если используем синтаксис Selenium_4, то указывать путь до драйвера нет необходимости.
-# Драйвер браузеров находится внутри библиотеки Selenium_4
-# pytest -v --driver Chrome tests/test_petFriends.py
-# pytest -v -s --browser_name=chrome --width_window=1024 --height_window=768 --language=ru --headless=true   tests/test_petFriends.py
-# pytest -v -s --browser_name=firefox --width_window=1024 --height_window=768 --language=ru --headless=true   tests/test_petFriends.py
-# pytest -v -s --browser_name=firefox --width_window=1024 --height_window=768 --language=ru --headless=false   tests/test_petFriends.py

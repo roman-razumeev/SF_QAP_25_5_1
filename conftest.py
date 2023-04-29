@@ -1,12 +1,10 @@
-import pytest, os, requests
+import pytest, os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service as ChromeService
-# from fake_useragent import UserAgent
+
 
 options = Options()
-# ua = UserAgent()
-# userAgent = ua.random
 
 
 def pytest_addoption(parser):
@@ -21,7 +19,7 @@ def pytest_addoption(parser):
     help="Open a browser invisible, without GUI is used by default")
 
 
-@pytest.fixture(autouse=True)  #, scope="function")
+@pytest.fixture(autouse=True)
 def browser(request):
     # Значения переменных user_language / browser_name / headless принимаются
     # из консоли.
@@ -34,19 +32,19 @@ def browser(request):
 
     if browser_name == "chrome":
         print ("\nstart chrome browser for test..")
-        # Чтобы указать язык браузера, использую класс Options и метод add_experimental_option
-        # Без браузерный режим для 'Chrome'
+        # Чтобы указать язык браузера, использую класс Options и метод
+        # add_experimental_option без браузерный режим для 'Chrome'
         options = Options ()
         if headless == 'true':
             options.add_argument ('headless')
 
-        # // Отключение сообщений в консоли типа: USB: usb_device_handle...
+        # Отключение сообщений в консоли типа: USB: usb_device_handle...
         options.add_experimental_option ('excludeSwitches', ['enable-logging'])
-        # // Выбор языка страницы
-        options.add_experimental_option ('prefs', {'intl.accept_languages': user_language})
+        # Выбор языка страницы
+        options.add_experimental_option('prefs', {'intl.accept_languages':
+                                                      user_language})
         browser = webdriver.Chrome (options=options)
         browser.set_window_size (width_window, height_window)
-        # browser.maximize_window ()  # почему-то с этой строкой не работает
         browser.implicitly_wait (10)  # Не явное ожидание элементов 10 сек.
 
     elif browser_name == "firefox":
@@ -55,8 +53,8 @@ def browser(request):
         if headless == 'true':
             os.environ['MOZ_HEADLESS'] = '1'
 
-        # Чтобы указать язык браузера, использую класс Options и метод add_experimental_option
-        # Для Firefox браузера
+        # Чтобы указать язык браузера, использую класс Options и метод
+        # add_experimental_option для Firefox браузера
         fp = webdriver.FirefoxProfile ()
         fp.set_preference ("intl.accept_languages", user_language)
         browser = webdriver.Firefox (firefox_profile=fp)
@@ -70,45 +68,21 @@ def browser(request):
             options.add_argument ('headless')
 
         service = ChromeService("ПУТЬ К ДРАЙВЕРУ НА КОМПЬЮТЕРЕ")
-        options.binary_location = "ПУТЬ К ЗАПУСКУ ЯндеКС БРАУЗЕРА НА КОМПЬЮТЕРЕ"
-        # // Отключение сообщений в консоли типа: USB: usb_device_handle...
+        options.binary_location = "ПУТЬ К ЗАПУСКУ ЯндеКС БРАУЗЕРА НА КОМПЕ"
+        # Отключение сообщений в консоли типа: USB: usb_device_handle...
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         browser = webdriver.Chrome(options=options, service=service)
         browser.set_window_size(width_window, height_window)
         browser.implicitly_wait(10)
 
     else:
-        raise pytest.UsageError("--browser_name should be chrome or firefox or yandex")
+        raise pytest.UsageError("--browser_name should be chrome or "
+                                "firefox or yandex")
 
     pytest.driver = browser
-    yield   #browser
+    yield
 
     print("\nquit browser..")
     browser.quit()
-    # pytest.driver.quit()
 
 
-"""
-Chorme и Firefox работают по умолчанию, так как добавлены в system PATH,
-если этого не сделано нужно добивать две строчки, как у яндекс-браузера:
-service = ChromeService ("ПУТЬ К ДРАЙВЕРУ НА КОМПЬЮТЕРЕ")
-options.binary_location = "ПУТЬ К ЗАПУСКУ БРАУЗЕРА НА КОМПЬЮТЕРЕ"
-"""
-
-# Supports console options (pytest):
-# --browser_name= (firefox or chrome or yandex)
-# --language=ru (default='en')
-# --headless=true (default='None')
-# --width_window=(default='1920')
-# --height_window=(default='1080')
-
-''' 
-pytest -v -s --browser_name=chrome --width_window=1024 --height_window=768 --language=ru --headless=true   tests/test_petFriends.py
-pytest -v -s --browser_name=firefox --width_window=1024 --height_window=768 --language=ru --headless=true   tests/test_petFriends.py
-pytest -v -s --browser_name=firefox --width_window=1024 --height_window=768 --language=ru --headless=false   tests/test_petFriends.py
-# pytest -v --driver Chrome tests/test_petFriends.py
-
-
-не работает из-за --reruns 1
-pytest -v -s  --tb=line --reruns 1  --browser_name=chrome --width_window=1024 --height_window=768 --language=ru --headless=true   tests/test_petFriends.py
-'''
